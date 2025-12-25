@@ -1,6 +1,6 @@
 # gpui-transitions.
 
-This crate provides API for interpolating between values in [gpui](https://www.gpui.rs).
+This crate provides an API for interpolating between values in [gpui](https://www.gpui.rs).
 
 
 Transitions can be constructed via `window.use_transition` or `window.use_keyed_transition`. It's very similar to the `use_state` API.
