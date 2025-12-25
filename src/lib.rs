@@ -16,16 +16,6 @@ pub use window::WindowUseTransition;
 mod state;
 pub use state::TransitionState;
 
-#[cfg(feature = "transition_element")]
-#[deprecated(
-    since = "0.1.0",
-    note = "The `element.with_transitions(...)` API is now deprecrated. Use `transition.read(...)` instead."
-)]
-mod transition_element;
-#[cfg(feature = "transition_element")]
-#[allow(deprecated)]
-pub use transition_element::*;
-
 /// A transition that can be applied to an element.
 #[derive(Clone)]
 pub struct Transition<T: Lerp + Clone + PartialEq + 'static> {
