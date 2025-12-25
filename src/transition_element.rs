@@ -5,6 +5,8 @@
 //! api (mainly Tesserae) to gradually adopt `transition.evaluate`.
 //! This will probably be removed soon, so it should not be used for new work.
 
+#![allow(deprecated)]
+
 use gpui::{
     AnyElement, App, Bounds, ElementId, GlobalElementId, InspectorElementId, Interactivity,
     LayoutId, Pixels, StyleRefinement, Window, prelude::*,
@@ -203,7 +205,7 @@ macro_rules! impl_with_transitions {
                     let mut request_frame = false;
 
                     let evaluated_values = ($({
-                        let (this_request_frame, transioned_value) = $names.evaluate(cx);
+                        let (this_request_frame, transioned_value) = $names.raw_evaluate(cx);
                         request_frame = this_request_frame || request_frame;
                         transioned_value
                     }),+);

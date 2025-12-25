@@ -1,6 +1,6 @@
 [package]
 name = "gpui_transitions"
-version = "0.1.1"
+version = "0.1.2"
 authors = [ "cameronpcampbell" ]
 edition = "2024"
 description = "provides an API for interpolating between values in GPUI."

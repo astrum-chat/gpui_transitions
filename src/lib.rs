@@ -23,6 +23,7 @@ pub use state::TransitionState;
 )]
 mod transition_element;
 #[cfg(feature = "transition_element")]
+#[allow(deprecated)]
 pub use transition_element::*;
 
 /// A transition that can be applied to an element.
