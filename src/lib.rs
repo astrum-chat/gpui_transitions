@@ -30,6 +30,11 @@ pub struct Transition<T: Lerp + Clone + PartialEq + 'static> {
 
     /// A cached version of the transition's value.
     cached_value: RefCell<Option<T>>,
+
+    /// Whether to continue the transition from the current value when the goal changes.
+    /// If true, transitions smoothly from current animated value to new goal.
+    /// If false, restarts from the original start value.
+    continuous: bool,
 }
 
 impl<T: Lerp + Clone + PartialEq + 'static> Transition<T> {
@@ -40,6 +45,7 @@ impl<T: Lerp + Clone + PartialEq + 'static> Transition<T> {
             easing: Rc::new(linear),
             state,
             cached_value: RefCell::new(None),
+            continuous: true,
         }
     }
 
@@ -48,6 +54,15 @@ impl<T: Lerp + Clone + PartialEq + 'static> Transition<T> {
     /// between 0 and 1
     pub fn with_easing(mut self, easing: impl Fn(f32) -> f32 + 'static) -> Self {
         self.easing = Rc::new(easing);
+        self
+    }
+
+    /// Sets whether the transition should be continuous.
+    ///
+    /// On goal updates, transitions continue from the current value by default.
+    /// If `continuous` is set to false, the transition will restart from its initial value.
+    pub fn continuous(mut self, continuous: bool) -> Self {
+        self.continuous = continuous;
         self
     }
 
@@ -130,12 +145,15 @@ impl<T: Lerp + Clone + PartialEq + 'static> Transition<T> {
 
             update(&mut state.end_goal, cx);
 
-            if state.end_goal == last_end_goal {
+            if self.continuous && state.end_goal == last_end_goal {
                 return;
             };
 
             state.goal_last_updated_at = Some(Instant::now());
-            state.start_goal = state.start_goal.lerp(&last_end_goal, state.last_delta);
+
+            if self.continuous {
+                state.start_goal = state.start_goal.lerp(&last_end_goal, state.last_delta);
+            }
 
             was_updated = true;
         });
@@ -146,5 +164,16 @@ impl<T: Lerp + Clone + PartialEq + 'static> Transition<T> {
     /// Get the entity ID associated with this entity
     pub fn entity_id(&self) -> EntityId {
         self.state.entity_id()
+    }
+
+    /// Reset the transition to its initial state.
+    pub fn reset(&self, cx: &mut App) {
+        self.state.update(cx, |state, _cx| {
+            state.goal_last_updated_at = None;
+            state.start_goal = state.initial_goal.clone();
+            state.end_goal = state.initial_goal.clone();
+            state.last_delta = 0.0;
+        });
+        *self.cached_value.borrow_mut() = None;
     }
 }
